@@ -1,7 +1,9 @@
 # frozen_string_literal: true
+
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
+
 require File.expand_path('../config/environment', __dir__)
 
 abort('The Rails environment is running in production mode!') if Rails.env.production?
@@ -16,6 +18,20 @@ rescue ActiveRecord::PendingMigrationError => e
   exit 1
 end
 
+def blob_for(name)
+  ActiveStorage::Blob.create_and_upload!(
+    io: File.open(Rails.root.join(file_fixture(name)), 'rb'),
+    filename: name,
+    content_type: 'image/png'
+  )
+end
+
+module WillExpected
+  def will_expected
+    expect { subject }
+  end
+end
+
 module GraphqlHelper
   def id_for(obj, type, cxt = {})
     AppSchema.id_from_object(obj, type, cxt)
@@ -23,8 +39,8 @@ module GraphqlHelper
 end
 
 RSpec.configure do |config|
+  config.include WillExpected
   config.include GraphqlHelper
-  config.include ActiveJob::TestHelper
   config.include FactoryBot::Syntax::Methods
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
   config.use_transactional_fixtures = true
@@ -56,12 +72,5 @@ RSpec.configure do |config|
 
   config.after(:suite) do
     DatabaseCleaner.clean_with :truncation
-  end
-end
-
-Shoulda::Matchers.configure do |config|
-  config.integrate do |with|
-    with.test_framework :rspec
-    with.library :rails
   end
 end

@@ -19,7 +19,7 @@ RSpec.describe Mutations::SignUpAccount do
     end
     let(:mutation) do
       <<~GRAPHQL
-        mutation SignUp($input: SignUpAccountInput!) {
+        mutation SignUpAccount($input: SignUpAccountInput!) {
           signUpAccount(input: $input) {
             account {
               id
@@ -34,7 +34,7 @@ RSpec.describe Mutations::SignUpAccount do
         username: new_account.username,
         email: new_account.email,
         password: 'password',
-        confirm_password: 'password'
+        passwordConfirmation: 'password'
       } }
     end
     let(:new_account) { build(:account) }
@@ -43,7 +43,7 @@ RSpec.describe Mutations::SignUpAccount do
       it 'OK' do
         res = execute
         expect(res[:errors]).to eq nil
-        expect(res[:data][:node][:emailVerificationStatus]).to eq 'REQUESTED'
+        expect(res[:data][:signUpAccount][:account][:emailVerificationStatus]).to eq 'REQUESTED'
       end
     end
 

@@ -39,10 +39,14 @@ group :development, :test do
   gem 'shoulda-matchers', '~> 4.4'
   gem 'simplecov', '~> 0.19.1', require: false
   gem 'test-prof'
+  gem 'vcr'
+  gem 'webmock'
 end
 
 group :development do
   gem 'listen', '~> 3.3'
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
+  gem 'letter_opener', '~> 1.7'
+  gem 'letter_opener_web', '~> 1.4'
 end

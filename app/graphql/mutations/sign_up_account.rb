@@ -12,8 +12,11 @@ module Mutations
     argument :avatar_url, String, required: false
 
     def resolve(**args)
-      account = Account.create!(args)
+      fail '2つのパスワードが一致してない' unless args[:password] == args[:password_confirmation]
+
+      account = Account.create!(args.except(:password_confirmation))
       AccountMailer.send_email_verification(account.id).deliver_later
+      account.email_verification_status_requested!
 
       { account: account, token: account.jwt }
     end

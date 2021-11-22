@@ -10,23 +10,26 @@ RSpec.describe Types::AccountType do
       AppSchema.execute(query, context: context, variables: variables).to_h.deep_symbolize_keys
     end
     let!(:account) { create(:account) }
-    let(:account_id) { id_for(account, described_class, {}) }
     let(:context) { { current_account: account } }
     let(:variables) { { id: account_id } }
-
-    context '正常系' do
-      let(:query) do
-        <<-GRAPHQL
-        fragment AccountDetail on Account {
-          id
-        }
+    let(:query) do
+      <<~GRAPHQL
         query GetAccount($id: ID!) {
           node(id: $id) {
             ...AccountDetail
           }
         }
-        GRAPHQL
-      end
+  
+        fragment AccountDetail on Account {
+          id
+          engineerOccupation
+          driverRequiredActions
+        }
+      GRAPHQL
+    end
+
+    context '正常系' do
+      let(:account_id) { id_for(account, Types::AccountType, {}) }
 
       it 'OK' do
         res = execute
