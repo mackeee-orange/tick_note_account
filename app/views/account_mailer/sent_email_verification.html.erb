@@ -1,0 +1,11 @@
+<div style="text-align: center;margin: 30px;">
+  <div>
+    <h1>メールアドレスをご確認ください</h1>
+  </div>
+  <div style="margin-top: 32px;">
+    <a href="<%= auth_v1_verify_email_url(token: @token, payload: @payload) %>"
+       style="padding: 8px 16px;background-color: #03b398;border-radius: 8px;color: white;text-decoration-line: none;">
+      メールアドレスの確認
+    </a>
+  </div>
+</div>

@@ -12,6 +12,7 @@ module Mutations
 
     def resolve(**args)
       account = Account.create!(args)
+      AccountMailer.send_email_verification(account.id).deliver_later
 
       { account: account, token: account.jwt }
     end
