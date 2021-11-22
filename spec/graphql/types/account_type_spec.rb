@@ -22,8 +22,6 @@ RSpec.describe Types::AccountType do
   
         fragment AccountDetail on Account {
           id
-          engineerOccupation
-          driverRequiredActions
         }
       GRAPHQL
     end
