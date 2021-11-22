@@ -6,30 +6,33 @@ class AppSchema < GraphQL::Schema
   mutation(Types::MutationType)
   query(Types::QueryType)
 
-  # Union and Interface Resolution
-  def self.resolve_type(_abstract_type, _obj, _ctx)
-    # TODO: Implement this function
-    # to return the correct object type for `obj`
-    fail(GraphQL::RequiredImplementationMissingError)
-  end
+  class << self
+    def resolve_type(_type, obj, _ctx = {})
+      Types.const_get("#{obj.class}Type")
+    end
 
-  # Relay-style Object Identification:
+    def object_from_id(node_id, _ctx = {})
+      type_name, object_id = self::UniqueWithinType.decode(node_id, separator: ':')
+      Object.const_get(type_name).find(object_id)
+    end
 
-  # Return a string UUID for `object`
-  def self.id_from_object(object, type_definition, query_ctx)
-    # Here's a simple implementation which:
-    # - joins the type name & object.id
-    # - encodes it with base64:
-    # GraphQL::Schema::UniqueWithinType.encode(type_definition.name, object.id)
-  end
+    def id_from_object(object, _type = nil, _ctx = {})
+      self::UniqueWithinType.encode(object.class.name, object.id, separator: ':')
+    end
 
-  # Given a string UUID, find the object
-  def self.object_from_id(id, query_ctx)
-    # For example, to decode the UUIDs generated above:
-    # type_name, item_id = GraphQL::Schema::UniqueWithinType.decode(id)
-    #
-    # Then, based on `type_name` and `id`
-    # find an object in your application
-    # ...
+    # なくてもnilを返すが明示
+    def unauthorized_object(_e)
+      nil
+    end
+
+    def unauthorized_field(_error)
+      nil
+    end
+
+    def type_error(e, ctx)
+      Sentry.set_context('graphql', { query: ctx.query.query_string })
+      Sentry.capture_exception(e)
+      super
+    end
   end
 end

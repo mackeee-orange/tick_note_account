@@ -9,6 +9,7 @@ module Mutations
     argument :email, String, required: true
     argument :password, String, required: true
     argument :password_confirmation, String, required: true
+    argument :avatar_url, String, required: false
 
     def resolve(**args)
       account = Account.create!(args)

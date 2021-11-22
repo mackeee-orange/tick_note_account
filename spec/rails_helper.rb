@@ -16,22 +16,46 @@ rescue ActiveRecord::PendingMigrationError => e
   exit 1
 end
 
+module GraphqlHelper
+  def id_for(obj, type, cxt = {})
+    AppSchema.id_from_object(obj, type, cxt)
+  end
+end
+
 RSpec.configure do |config|
+  config.include GraphqlHelper
+  config.include ActiveJob::TestHelper
+  config.include FactoryBot::Syntax::Methods
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
   config.use_transactional_fixtures = true
   config.infer_spec_type_from_file_location!
   config.filter_rails_from_backtrace!
   config.include Rails.application.routes.url_helpers
-  config.include FactoryBot::Syntax::Methods
-  config.include ActiveJob::TestHelper
 
-  config.before(:suite) do
-    DatabaseCleaner.clean_with :truncation
-    Rails.application.load_seed
+  config.before(:all) do
+    DatabaseCleaner.strategy = :transaction
   end
 
-  config.define_derived_metadata do |meta|
-    meta[:aggregate_failures] = true unless meta.key?(:aggregate_failures)
+  config.before(:each) do
+    DatabaseCleaner.start
+  end
+
+  config.after(:each) do
+    DatabaseCleaner.clean
+  end
+
+  config.after(:each, type: :request) do |example|
+    next if response&.body.blank? || [301, 302].include?(response&.status)
+
+    if example.metadata[:response].present? && example.metadata[:response].key?(:examples)
+      example.metadata[:response][:examples] = {
+        'application/json' => JSON.parse(response.body, symbolize_names: true)
+      }
+    end
+  end
+
+  config.after(:suite) do
+    DatabaseCleaner.clean_with :truncation
   end
 end
 
