@@ -8,7 +8,8 @@ RUN apt-get update -qq && \
     libpq-dev \
     nodejs \
     imagemagick \
-    graphviz
+    graphviz \
+    emacs
 
 ENV APP_ROOT /app
 WORKDIR ${APP_ROOT}

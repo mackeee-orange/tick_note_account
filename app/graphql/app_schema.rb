@@ -3,8 +3,8 @@
 class AppSchema < GraphQL::Schema
   include ::GraphqlExceptionHandler
 
-  mutation(Types::MutationType)
-  query(Types::QueryType)
+  query(::Types::QueryType)
+  mutation(::Types::MutationType)
 
   class << self
     def resolve_type(_type, obj, _ctx = {})

@@ -16,13 +16,12 @@ RSpec.describe Types::AccountType do
       <<~GRAPHQL
         query GetAccount($id: ID!) {
           node(id: $id) {
-            ...AccountDetail
+            ... on Account {
+              id
+            }
           }
         }
-  
-        fragment AccountDetail on Account {
-          id
-        }
+
       GRAPHQL
     end
 

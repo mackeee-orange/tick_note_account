@@ -4,13 +4,16 @@ module JWT
   module Authenticatable
     extend ActiveSupport::Concern
 
+    ALGORITHM = 'HS256'
+
     included do
       # JWT失効させる
       def invalidate_jwt!(token)
         payload, _header = JWT::Helper.decode(token)
-        fail JWT::InvalidSubError if payload['sub'] != id
+        _type, sub = GraphQL::Schema::UniqueWithinType.decode(payload['sub'], separator: ':')
+        fail Exceptions::UnauthorizedError if sub != id
 
-        Jti.destroy(payload['jti'])
+        Jti.destroy!(payload['jti'])
       end
 
       def jwt
@@ -22,10 +25,10 @@ module JWT
           iat: iat,
           exp: exp,
           jti: jti.id,
-          sub: id
+          sub: GraphQL::Schema::UniqueWithinType.encode(self.class.name, id, separator: ':')
         }
 
-        JWT::Helper.encode(payload)
+        JWT::Helper.encode(payload, ALGORITHM, 'JWT')
       end
     end
 
@@ -33,13 +36,14 @@ module JWT
       def authenticate!(token)
         payload, _header = JWT::Helper.decode(
           token,
-          algorithm: 'HS256',
+          algorithm: ALGORITHM,
           verify_jti: proc { |jti|
             Jti.exists?(jti)
           }
         )
 
-        find(payload['sub'])
+        _type, sub = GraphQL::Schema::UniqueWithinType.decode(payload['sub'], separator: ':')
+        find(sub)
       end
     end
   end
