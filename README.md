@@ -10,6 +10,3 @@ Rails6（GraphQL）+ Docker + PostgreSQL + Auth機能
 4. `docker-compose exec app db:create`コマンドを実行する
 5. `docker-compose exec app db:migrate`コマンドを実行する
 6. `http://localhost:3000/`にアクセスし、「Yay! You’re on Rails!」の表示が出ていれば完了
-
-
-
