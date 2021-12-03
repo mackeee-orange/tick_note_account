@@ -12,3 +12,4 @@ Rails6（GraphQL）+ Docker + PostgreSQL + Auth機能
 6. `http://localhost:3000/`にアクセスし、「Yay! You’re on Rails!」の表示が出ていれば完了
 
 
+
