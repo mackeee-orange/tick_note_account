@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_03_163124) do
+ActiveRecord::Schema.define(version: 2021_12_03_181229) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -32,10 +32,34 @@ ActiveRecord::Schema.define(version: 2021_12_03_163124) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "note_taggings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "note_id", null: false
+    t.uuid "tag_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["note_id"], name: "index_note_taggings_on_note_id"
+    t.index ["tag_id"], name: "index_note_taggings_on_tag_id"
+  end
+
+  create_table "notes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "author_id", null: false
+    t.string "title", null: false, comment: "タイトル"
+    t.text "content", comment: "本文"
+    t.datetime "expired_at", null: false, comment: "ノートの有効期限"
+    t.boolean "is_public", null: false, comment: "公開されているかいなか"
+    t.boolean "is_forever", default: false, null: false, comment: "永久保存版か"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["author_id"], name: "index_notes_on_author_id"
+  end
+
   create_table "tags", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name", null: false, comment: "タグ名"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  add_foreign_key "note_taggings", "notes", on_delete: :cascade
+  add_foreign_key "note_taggings", "tags", on_delete: :cascade
+  add_foreign_key "notes", "accounts", column: "author_id", on_delete: :cascade
 end

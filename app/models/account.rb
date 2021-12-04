@@ -11,6 +11,8 @@ class Account < ApplicationRecord
 
   has_secure_password
 
+  has_many :notes
+
   # Enum
   enum email_verification_status: { unspecified: 0, requested: 1, verified: 2 }, _prefix: true
 
