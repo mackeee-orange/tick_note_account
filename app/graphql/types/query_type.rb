@@ -5,12 +5,8 @@ module Types
     # field :id...
     add_field GraphQL::Types::Relay::NodeField
 
-    field :current_account, Types::AccountType, null: true do
-      current_account
-    end
+    field :current_account, resolver: Resolvers::CurrentAccountResolver
 
     field :accounts, resolver: Resolvers::AccountsResolver
-
-
   end
 end

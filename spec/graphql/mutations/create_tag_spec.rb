@@ -12,7 +12,7 @@ RSpec.describe Mutations::CreateTag do
     let(:mutation) do
       <<~GRAPHQL
         mutation CreateTag($input: CreateTagInput!) {
-          signUpAccount(input: $input) {
+          createTag(input: $input) {
             tag {
               id
             }
