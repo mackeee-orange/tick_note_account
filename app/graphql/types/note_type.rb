@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 module Types
-  # Tag
-  class TagType < Types::BaseObject
+  # Note
+  class NoteType < Types::BaseObject
+    graphql_name 'Note'
     implements GraphQL::Types::Relay::Node
 
     global_id_field :id
